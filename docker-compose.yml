@@ -1,0 +1,61 @@
+volumes:
+  pgdata:
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: mems-frontend
+    env_file:
+      - .env-non-dev
+    volumes:
+      - ./frontend/public:/app/public
+      - ./frontend/src:/app/src
+    network_mode: "host"
+      
+  db:
+    image: postgres:15
+    container_name: db_mems
+    env_file:
+      - .env-non-dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    network_mode: "host"
+      
+  api:
+    build:
+      context: ./api
+    env_file:
+      - .env-non-dev
+    container_name: mems-api
+    # ports:
+    #   - 8000:8000
+    volumes:
+      - ./api:/api
+    restart: always
+    depends_on:
+      - db
+      - s3_storage
+      - frontend
+      - redis
+      - pgadmin
+    command: alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --reload
+    network_mode: "host"
+
+  redis:
+    image: redis
+    expose:
+      - 6379
+    network_mode: "host"
+
+  pgadmin:
+    image: elestio/pgadmin:latest
+    restart: always
+    env_file:
+      - .env-non-dev
+    volumes:
+      - ./servers.json:/pgadmin4/servers.json
+    depends_on:
+      - db
+    network_mode: "host"
+    
