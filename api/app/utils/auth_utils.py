@@ -13,7 +13,6 @@ from ..config.app_config import (
     JWT_TOKEN_SECRET_KEY,
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
-from ..repositories.storage_repository import BaseStorageRepo
 from ..config.db_config import get_db
 from ..models.user import User
 from ..schemas.users import UserDbSchema
@@ -71,24 +70,17 @@ def authenticate_user(
 
 
 async def register_user(
-    storage_repo: BaseStorageRepo,
     user_data: dict,
-    file: Optional[UploadFile] = None,
     db: Session = Depends(get_db),
 ) -> UserDbSchema | None:
     """
     add user to db
     """
     username = user_data["username"]
-    storage_username = f"user_{username}"
-    if file:
-        await storage_repo.add_image(storage_username, file.file)
     hashed_password = get_password_hash(user_data["password"])
     new_user_dict = {
         "username": username,
         "hashed_password": hashed_password,
-        "first_name": user_data["first_name"],
-        "last_name": user_data["last_name"],
     }
     new_user = User(**new_user_dict)
     db.add(new_user)

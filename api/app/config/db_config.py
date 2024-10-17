@@ -11,7 +11,6 @@ SQLALCHEMY_DATABASE_URL = (
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    # echo=True
 )
 
 if not database_exists(SQLALCHEMY_DATABASE_URL):

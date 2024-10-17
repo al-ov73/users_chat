@@ -12,29 +12,22 @@ const SignupPage = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const [isLoading, setLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
       .min(3, 'от 3 о 20 символов')
       .max(20, 'от 3 о 20 символов')
       .required('required field'),
-    first_name: Yup.string()
-      .min(3, 'от 3 о 20 символов')
-      .max(20, 'от 3 о 20 символов'),
-    last_name: Yup.string()
-      .min(3, 'от 3 о 20 символов')
-      .max(20, 'от 3 о 20 символов'),
     password: Yup.string().min(2, 'больше 2 символов'),
     passwordConfirmation: Yup.string()
       .oneOf([Yup.ref('password'), null], 'Пароли должны совпадать'),
   });
 
 
-  const handleSubmit = (values) => async () => {
+  const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      const response = await signupUser(values, selectedImage)
+      const response = await signupUser(values)
       const { access_token } = response.data;
       if (access_token) {
         localStorage.setItem('user', access_token)
@@ -51,13 +44,11 @@ const SignupPage = () => {
   const formik = useFormik({
     initialValues: {
       username: '',
-      first_name: '',
-      last_name: '',
       password: '',
       passwordConfirmation: '',
     },
     validationSchema: SignupSchema,
-    onSubmit: (values) => dispatch(handleSubmit(values)),
+    onSubmit: values => handleSubmit(values),
   });
 
   return <>
@@ -86,30 +77,6 @@ const SignupPage = () => {
                       <ErrorMessage name="username" />
                     </Form.Group>
 
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="first_name">Ваше имя</Form.Label>
-                        <Form.Control type="text"
-                          placeholder="Ваше имя"
-                          autoComplete="first_name"
-                          id="first_name"
-                          onChange={formik.handleChange}
-                          value={formik.values.first_name}
-                          />
-                      <ErrorMessage name="username" />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="last_name">Ваша фамилия</Form.Label>
-                        <Form.Control type="text"
-                          placeholder="Ваша фамилия"
-                          autoComplete="last_name"
-                          id="last_name"
-                          onChange={formik.handleChange}
-                          value={formik.values.last_name}
-                          />
-                      <ErrorMessage name="last_name" />
-                    </Form.Group>
-
                     <Form.Group className="mb-3" >
                       <Form.Label htmlFor="password">Пароль</Form.Label>
                       <Form.Control type="password"
@@ -132,15 +99,6 @@ const SignupPage = () => {
                       <ErrorMessage name="passwordConfirmation" />
                     </Form.Group>
 
-                    <Form.Label className="mt-1">Ваша фотография</Form.Label>
-                    <Form.Control
-                    className="mb-3"
-                      type="file"
-                      name="file"
-                      onChange={(event) => {
-                        setSelectedImage(event.target.files[0]);
-                      }}
-                    />
                     <Button type="submit" disabled={isLoading}>
                       Зарегистрироваться
                     </Button>

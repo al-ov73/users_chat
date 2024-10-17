@@ -21,7 +21,7 @@ const LoginPage = () => {
     password: Yup.string().min(2, 'Не менее 6 символов'),
   });
 
-  const handleSubmit = (values, actions) => async () => {
+  const handleSubmit = async (values, actions) => {
     setLoading(true)
     try {
       const response = await loginUser(values);

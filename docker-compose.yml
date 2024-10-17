@@ -5,7 +5,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: mems-frontend
+    container_name: frontend
     env_file:
       - .env-non-dev
     volumes:
@@ -15,7 +15,7 @@ services:
       
   db:
     image: postgres:15
-    container_name: db_mems
+    container_name: db
     env_file:
       - .env-non-dev
     volumes:
@@ -27,15 +27,12 @@ services:
       context: ./api
     env_file:
       - .env-non-dev
-    container_name: mems-api
-    # ports:
-    #   - 8000:8000
+    container_name: api
     volumes:
       - ./api:/api
     restart: always
     depends_on:
       - db
-      - s3_storage
       - frontend
       - redis
       - pgadmin

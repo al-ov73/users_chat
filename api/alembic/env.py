@@ -7,10 +7,6 @@ from alembic import context
 
 from app.config.db_config import Base
 from app.models.user import User
-from app.models.meme import Meme
-from app.models.comment import Comment
-from app.models.label import Label, LabelMeme
-from app.models.like import Like
 from app.models.message import Message
 
 

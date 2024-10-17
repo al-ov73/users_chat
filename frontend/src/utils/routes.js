@@ -5,11 +5,6 @@ export default {
   signupPath: `${apiPath}/auth/jwt/signup`,
   validateTokenPath: `${apiPath}/auth/jwt/validate_token`,
   usersPath: `${apiPath}/users`,
-  memesPath: `${apiPath}/memes`,
-  labelsPath: `${apiPath}/labels`,
-  commentsPath: `${apiPath}/comments`,
-  likesPath: `${apiPath}/likes`,
   chatPath: `${apiPath}/chat`,
   messagesPath: `${apiPath}/chat/messages`,
-  apiStatic: `${apiPath}/static`,
 };
