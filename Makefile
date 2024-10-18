@@ -14,7 +14,7 @@ docker-build:
 		docker compose -f docker-compose.yml build
 
 docker-run:
-		docker compose -f docker-compose.yml up
+		docker compose up --remove-orphans
 
 docker-run-host:
 		docker compose -f docker-compose-host.yml up

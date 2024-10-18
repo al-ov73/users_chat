@@ -17,10 +17,11 @@ class User(Base):
 
     id: Mapped[intpk]
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
-    first_name: Mapped[Optional[str]]
-    last_name: Mapped[Optional[str]]
     registered_at: Mapped[created_at]
     hashed_password: Mapped[str] = mapped_column(nullable=False)
-    messages: Mapped["Message"] = relationship(  # noqa: F821
-        back_populates="author"
-    )
+    # messages_sent: Mapped["Message"] = relationship(  # noqa: F821
+    #     back_populates="author"
+    # )
+    # messages_received: Mapped["Message"] = relationship(  # noqa: F821
+    #     back_populates="receiver"
+    # )

@@ -36,13 +36,26 @@ services:
       - frontend
       - redis
       - pgadmin
-    command: alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --reload
+      - worker
+    command: gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --reload
     network_mode: "host"
 
   redis:
     image: redis
     expose:
       - 6379
+    network_mode: "host"
+
+  worker:
+    build:
+      context: ./api
+    command: celery -A app.tasks.tasks worker --loglevel=info
+    volumes:
+      - ./api:/api
+    env_file:
+      - .env-non-dev
+    depends_on:
+      - redis
     network_mode: "host"
 
   pgadmin:

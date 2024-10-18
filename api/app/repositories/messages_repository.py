@@ -16,8 +16,7 @@ class MessagesRepository:
         '''
         return list of messages from db
         '''
-        query = db.query(Message)
-        query = query.options(joinedload(Message.author))
+        query = db.query(Message).options(joinedload(Message.author)).options(joinedload(Message.receiver))
         return query
 
     async def get_message(
@@ -26,7 +25,7 @@ class MessagesRepository:
             db: Session,
     ) -> MessageSchema:
         '''
-        return message from db
+        return message from db by id
         '''
         message = db.get(Message, message_id)
         if not message:

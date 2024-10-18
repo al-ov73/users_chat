@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers.auth import router as router_auth
 from .routers.chat import router as router_chat
+from .routers.users import router as router_users
 
 
 app = FastAPI()
@@ -10,7 +11,6 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://172.18.0.1:3000",
 ]
 
 app.add_middleware(
@@ -31,4 +31,10 @@ app.include_router(
     router_chat,
     prefix="/chat",
     tags=["chat"],
+)
+
+app.include_router(
+    router_users,
+    prefix="/users",
+    tags=["users"],
 )

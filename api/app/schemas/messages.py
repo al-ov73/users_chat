@@ -8,3 +8,4 @@ class MessageSchema(BaseModel):
     text: str
     created_at: datetime
     author: UserSchema
+    receiver: UserSchema

@@ -8,6 +8,7 @@ from ..config.db_config import get_db
 from ..config.dependencies import get_messages_repository
 from ..models.message import Message
 from ..schemas.messages import MessageSchema
+from ..tasks.tasks import send_message_to_user
 from ..utils.auth_utils import get_current_user
 from ..utils.chat_utils import ConnectionManager
 
@@ -29,6 +30,8 @@ async def get_last_messages(
     '''
     send all last chat messages
     '''
+    print('get messages func')
+    send_message_to_user.delay()
     messages = await messages_repo.get_messages(skip, limit, db)
     return messages
 
@@ -46,7 +49,8 @@ async def websocket_endpoint(
     try:
         while True:
             data = await websocket.receive_json()
-            new_message = Message(text=data['text'], author_id=data['author'])
+            print('data', data)
+            new_message = Message(text=data['text'], author_id=data['author'], receiver_id=data['receiver'])
             new_message = await messages_repo.add_message(new_message, db)
             await manager.broadcast(new_message)
     except WebSocketDisconnect:

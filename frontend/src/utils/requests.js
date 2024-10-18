@@ -44,8 +44,8 @@ const validateToken = async (accessToken) => {
   }
 };
 
-const getUser = async (userId, accessToken) => {
-  const response = await axios.get(`${routes.usersPath}/${userId}`, {
+const getUsers = async (accessToken) => {
+  const response = await axios.get(`${routes.usersPath}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -59,5 +59,5 @@ export {
   postMeme,
   signupUser,
   validateToken,
-  getUser,
+  getUsers,
 };

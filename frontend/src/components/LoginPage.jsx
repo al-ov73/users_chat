@@ -80,7 +80,7 @@ const LoginPage = () => {
                     <ErrorMessage component="div" name="password" />
                     </Form.Group>
                     <Button type="submit" disabled={isLoading}>
-                      'Войти'
+                      Войти
                     </Button>
                   </Form>
                   </FormikProvider>
