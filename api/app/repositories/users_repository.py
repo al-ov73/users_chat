@@ -6,12 +6,12 @@ from ..schemas.users import UserSchema
 
 class UsersRepository:
 
+    @staticmethod
     async def get_users(
-            self,
             db: Session,
     ) -> list[UserSchema]:
         """
         return list of users from db
         """
-        query = db.query(User).all()
+        query = db.query(User)
         return query

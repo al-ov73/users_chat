@@ -27,10 +27,9 @@ async def get_last_messages(
     db: Session = Depends(get_db),
     messages_repo: MessagesRepository = Depends(get_messages_repository),
 ) -> List[MessageSchema]:
-    '''
+    """
     send all last chat messages
-    '''
-    print('get messages func')
+    """
     send_message_to_user.delay()
     messages = await messages_repo.get_messages(skip, limit, db)
     return messages
@@ -42,17 +41,15 @@ async def websocket_endpoint(
     db: Session = Depends(get_db),
     messages_repo: MessagesRepository = Depends(get_messages_repository),
 ):
-    '''
+    """
     wait message from Websocket and send it through all opened connections
-    '''
+    """
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_json()
-            print('data', data)
             new_message = Message(text=data['text'], author_id=data['author'], receiver_id=data['receiver'])
             new_message = await messages_repo.add_message(new_message, db)
             await manager.broadcast(new_message)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast("Client left the chat")

@@ -22,6 +22,9 @@ Base = declarative_base()
 
 
 def get_db():
+    """
+    return session to work with db
+    """
     db = SessionLocal()
     try:
         yield db

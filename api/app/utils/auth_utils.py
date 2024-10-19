@@ -140,7 +140,6 @@ async def get_current_user(
             raise credentials_exception
         token_data = TokenDataSchema(username=username)
     except InvalidTokenError:
-        print("InvalidTokenError!!!")
         raise credentials_exception
     user = get_user(token_data.username, db)
     if user is None:

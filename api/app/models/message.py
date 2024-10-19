@@ -1,9 +1,9 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..config.db_config import Base
-from .user import intpk
 from .user import created_at
+from .user import intpk
+from ..config.db_config import Base
 
 
 class Message(Base):
@@ -13,15 +13,19 @@ class Message(Base):
     text: Mapped[str]
     created_at: Mapped[created_at]
 
-    author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    author_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+        )
+    receiver_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+        )
 
     author: Mapped["User"] = relationship(  # noqa: F821
-        # back_populates="messages_sent",
-        foreign_keys=[author_id])
+        foreign_keys=[author_id]
+    )
     receiver: Mapped["User"] = relationship(  # noqa: F821
-        # back_populates="receiver",
-        foreign_keys=[receiver_id])
+        foreign_keys=[receiver_id]
+    )
 
     def to_dict(self):
         return {

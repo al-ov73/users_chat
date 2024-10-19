@@ -1,32 +1,31 @@
 from datetime import timedelta
-from typing import Annotated, Optional
+from typing import Annotated
 
-from fastapi import Depends, HTTPException, status, APIRouter, Form, UploadFile
+from fastapi import Depends, HTTPException, status, APIRouter, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from ..config.app_config import ACCESS_TOKEN_EXPIRE_MINUTES
+from ..config.db_config import get_db
+from ..schemas.tokens import TokenSchema
 from ..utils.auth_utils import (
     authenticate_user,
     create_access_token,
     register_user
 )
-from ..config.db_config import get_db
-from ..config.app_config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..utils.auth_utils import get_current_user
-from ..schemas.tokens import TokenSchema
-
 
 router = APIRouter()
 
 
 @router.post("/login")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db),
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        db: Session = Depends(get_db),
 ) -> TokenSchema:
-    '''
+    """
     check user in db, create and return JWT-token
-    '''
+    """
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -43,13 +42,13 @@ async def login_for_access_token(
 
 @router.post("/signup")
 async def signup_for_access_token(
-    username: str = Form(),
-    password: str = Form(),
-    db: Session = Depends(get_db),
+        username: str = Form(),
+        password: str = Form(),
+        db: Session = Depends(get_db),
 ) -> TokenSchema:
-    '''
+    """
     add user in db, create and return JWT-token
-    '''
+    """
     user_data = {
         'username': username,
         'password': password,
@@ -70,11 +69,11 @@ async def signup_for_access_token(
 
 @router.get("/validate_token/{token}")
 async def validate_token(
-    token: str,
-    db: Session = Depends(get_db),
+        token: str,
+        db: Session = Depends(get_db),
 ) -> bool:
-    '''
-    validate token from frontend response
-    '''
+    """
+    validate token and return True if it is not expired and valid
+    """
     user = await get_current_user(token, db)
     return True if user else False
