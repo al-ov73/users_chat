@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Optional
+from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status, UploadFile
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -15,8 +15,8 @@ from ..config.app_config import (
 )
 from ..config.db_config import get_db
 from ..models.user import User
-from ..schemas.users import UserDbSchema
 from ..schemas.tokens import TokenDataSchema
+from ..schemas.users import UserDbSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -42,8 +42,8 @@ def get_password_hash(password: str) -> str:
 
 
 def get_user(
-    username: str,
-    db: Session = Depends(get_db),
+        username: str,
+        db: Session = Depends(get_db),
 ) -> UserDbSchema:
     """
     return user from db
@@ -70,8 +70,8 @@ def authenticate_user(
 
 
 async def register_user(
-    user_data: dict,
-    db: Session = Depends(get_db),
+        user_data: dict,
+        db: Session = Depends(get_db),
 ) -> UserDbSchema | None:
     """
     add user to db
@@ -92,8 +92,8 @@ async def register_user(
 
 
 def create_access_token(
-    user: UserDbSchema,
-    expires_delta: timedelta | None = None
+        user: UserDbSchema,
+        expires_delta: timedelta | None = None
 ) -> str:
     """
     return JWT token with expires time
@@ -106,20 +106,21 @@ def create_access_token(
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = (
-            datetime.now(timezone.utc) +
-            timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+                datetime.now(timezone.utc) +
+                timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode,
-        JWT_TOKEN_SECRET_KEY, algorithm=ALGORITHM
+        JWT_TOKEN_SECRET_KEY,
+        algorithm=ALGORITHM
     )
     return encoded_jwt
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: Session = Depends(get_db)
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
 ) -> UserDbSchema:
     """
     return user from db according JWT-token data

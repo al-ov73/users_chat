@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..config.app_config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..config.db_config import get_db
+from ..config.logger_config import get_logger
 from ..schemas.tokens import TokenSchema
 from ..utils.auth_utils import (
     authenticate_user,
@@ -17,6 +18,7 @@ from ..utils.auth_utils import get_current_user
 
 router = APIRouter()
 
+logger = get_logger(__name__)
 
 @router.post("/login")
 async def login_for_access_token(
@@ -26,6 +28,7 @@ async def login_for_access_token(
     """
     check user in db, create and return JWT-token
     """
+    logger.info(f'Request for login user {form_data.username}')
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -37,6 +40,7 @@ async def login_for_access_token(
     access_token = create_access_token(
         user=user, expires_delta=access_token_expires
     )
+    logger.info(f'Return token for user {form_data.username}')
     return TokenSchema(access_token=access_token, token_type="bearer")
 
 
@@ -49,6 +53,7 @@ async def signup_for_access_token(
     """
     add user in db, create and return JWT-token
     """
+    logger.info(f'Request for signup user {username}')
     user_data = {
         'username': username,
         'password': password,
@@ -64,6 +69,7 @@ async def signup_for_access_token(
     access_token = create_access_token(
         user=user, expires_delta=access_token_expires
     )
+    logger.info(f'Return token for user {username}')
     return TokenSchema(access_token=access_token, token_type="bearer")
 
 
@@ -75,5 +81,6 @@ async def validate_token(
     """
     validate token and return True if it is not expired and valid
     """
+    logger.info('Request for validate token')
     user = await get_current_user(token, db)
     return True if user else False

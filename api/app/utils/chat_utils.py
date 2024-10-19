@@ -1,6 +1,9 @@
 from fastapi import WebSocket
 
+from ..config.logger_config import get_logger
 from ..schemas.messages import MessageSchema
+
+logger = get_logger(__name__)
 
 
 class ConnectionManager:
@@ -9,7 +12,10 @@ class ConnectionManager:
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
+        logger.info('Get new websocket connection')
+        print(websocket)
         self.active_connections.append(websocket)
+        logger.info(f'Total connections: {len(self.active_connections)}')
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)

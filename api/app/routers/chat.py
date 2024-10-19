@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from sqlalchemy.orm import Session
 
+from ..config.logger_config import get_logger
 from ..repositories.messages_repository import MessagesRepository
 from ..config.db_config import get_db
 from ..config.dependencies import get_messages_repository
@@ -16,6 +17,7 @@ router = APIRouter()
 
 manager = ConnectionManager()
 
+logger = get_logger(__name__)
 
 @router.get(
     "/messages",
@@ -30,7 +32,8 @@ async def get_last_messages(
     """
     send all last chat messages
     """
-    send_message_to_user.delay()
+    logger.info(f'Get request for last messages. Skip: {skip}, Limit: {limit}')
+    # send_message_to_user.delay()
     messages = await messages_repo.get_messages(skip, limit, db)
     return messages
 
