@@ -9,6 +9,8 @@ celery = Celery('tasks', broker=CELERY_BROKER_URL)
 
 
 @celery.task
-def send_message_to_user():
-    print('!!!!!!send message!!!!!!!----------------')
-    asyncio.run(send_message())
+def send_message_to_telegram(message: dict):
+    """
+    send message to receiver's telegram
+    """
+    asyncio.run(send_message(message))

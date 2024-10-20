@@ -1,28 +1,48 @@
 from fastapi import WebSocket
 
 from ..config.logger_config import get_logger
-from ..schemas.messages import MessageSchema
+from ..tasks.tasks import send_message_to_telegram
 
 logger = get_logger(__name__)
 
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: list[WebSocket] = []
+        self.active_connections: dict[int, WebSocket] = {}
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, user_id: int, websocket: WebSocket):
+        """
+        accept websocket connection and add it to active connections list
+        """
         await websocket.accept()
-        logger.info('Get new websocket connection')
-        print(websocket)
-        self.active_connections.append(websocket)
-        logger.info(f'Total connections: {len(self.active_connections)}')
+        logger.info(f'Got new websocket connection from {user_id}')
+        self.active_connections[user_id] = websocket
+        logger.info('active_connections', self.active_connections)
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self, user_id: int):
+        """
+        remove socket from active connetions
+        """
+        logger.info(f'User id:{user_id} disconnected from websocket')
+        self.active_connections.pop(user_id)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_personal_message(
+            self,
+            message: dict,
+            author_id: int,
+            receiver_id: int
+    ):
+        """
+        send message to receiver and author
+        """
+        # send message to author
+        author_wc = self.active_connections.get(author_id)
+        await author_wc.send_json(message)
 
-    async def broadcast(self, message: MessageSchema):
-        for connection in self.active_connections:
-            await connection.send_json(message.to_dict())
+        # send message to receiver
+        if self.active_connections.get(receiver_id):
+            receiver_wc = self.active_connections.get(receiver_id)
+            await receiver_wc.send_json(message)
+        else:
+            print('msg ->>>', message)
+            send_message_to_telegram.delay(message)

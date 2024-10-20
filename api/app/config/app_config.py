@@ -29,4 +29,4 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 
 # Telegram config
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = os.getenv("ADMIN_ID")
+TELEGRAM_USER_ID = os.getenv("ADMIN_ID")

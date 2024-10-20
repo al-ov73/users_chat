@@ -4,19 +4,21 @@ import Modal from 'react-bootstrap/Modal';
 import { FormikProvider, useFormik } from "formik";
 import Form from 'react-bootstrap/Form';
 import React, { useEffect, useState } from "react";
-import { getUserIdFromStorage } from '../utils/utils';
+import { getUserIdFromStorage, getUsernameFromStorage } from '../utils/utils';
 import { getMessages, getUsers } from '../utils/requests';
+import routes from '../utils/routes';
 
 
-const ws = new WebSocket(`ws://127.0.0.1:8000/chat/ws`);
+const currentUserId = getUserIdFromStorage();
+const ws = new WebSocket(`${routes.wcPath}/${currentUserId}`);
 
 
-const IndexPage = ({ show, onHide }) => {
+const IndexPage = () => {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const access_token = localStorage.getItem('user')
 
-  const currentUserId = getUserIdFromStorage();
+  const currentUsername = getUsernameFromStorage();
 
 //   get all messages
   useEffect(() => {
@@ -33,9 +35,9 @@ const IndexPage = ({ show, onHide }) => {
         setUsers(users)
       });
   }, [])
-
   console.log('users', users)
   console.log('messages', messages)
+
   ws.onmessage = (event) => {
     const receivedJson = JSON.parse(event.data)
     setMessages([...messages, receivedJson])
@@ -54,17 +56,16 @@ const IndexPage = ({ show, onHide }) => {
     }
   }
 
-    const formik = useFormik({
-        initialValues: {
-            message: '',
-            receiver: '',
-        },
-        onSubmit: (messageObject, { resetForm }) => {
-          console.log('messageObject', messageObject)
-          handleMessageSubmit(messageObject);
-          resetForm();
-        },
-    });
+  const formik = useFormik({
+      initialValues: {
+          message: '',
+          receiver: '',
+      },
+      onSubmit: (messageObject, { resetForm }) => {
+        handleMessageSubmit(messageObject);
+        resetForm();
+      },
+  });
 
   return (
     <>
@@ -74,7 +75,7 @@ const IndexPage = ({ show, onHide }) => {
             <div className='col-md-6'>
               <div className='card shadow-sm'>
                 <div className='card-body row p-5'>
-
+                  Здравствуйте, {currentUsername}
                   <FormikProvider value={formik}>
                     <Form onSubmit={formik.handleSubmit} noValidate="" className="py-1 border-0">
                       <Form.Label>Введите сообщение</Form.Label>
@@ -95,12 +96,13 @@ const IndexPage = ({ show, onHide }) => {
                         className="my-3"
                         id="receiver"
                         name="receiver"
+                        value={formik.values.receiver}
                         onChange={formik.handleChange}>
                         {users.map((user) => {
-                          const userId = user.id
-                          return <option key={userId} value={userId}>{user.username}</option>
+                          return <option key={user.id} value={user.id}>{user.username}</option>
                         })}
                       </Form.Select>
+
                       <Button type="submit" variant='outline-secondary'>
                         Отправить
                       </Button>
@@ -131,7 +133,7 @@ const IndexPage = ({ show, onHide }) => {
                       const messageDate = `${formatedDate.toLocaleDateString("ru-RU")}`
                       const dateFormat = `${messageDate}: ${messageTime}`;
                       return <div key={message.id} className="text-break mb-2">
-                              <strong className="fs-6">{message.author.username} </strong>
+                              <strong className="fs-6">От {message.author.username} </strong>
                               <em>{dateFormat}: </em>
                               <span>{message.text}</span>
                             </div>
@@ -140,13 +142,7 @@ const IndexPage = ({ show, onHide }) => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div className='d-flex flex-column h-100'>
-        <div className='container-fluid h-100'>
-          <div className='row justify-content-center align-content-center h-100'>
             <div className='col-md-6'>
               <div className='card shadow-sm'>
                 <div className='card-body row p-5'>
@@ -160,7 +156,7 @@ const IndexPage = ({ show, onHide }) => {
                       const messageDate = `${formatedDate.toLocaleDateString("ru-RU")}`
                       const dateFormat = `${messageDate}: ${messageTime}`;
                       return <div key={message.id} className="text-break mb-2">
-                              <strong className="fs-6">{message.author.username} </strong>
+                              <strong className="fs-6">{'->'} {message.receiver.username} </strong>
                               <em>{dateFormat}: </em>
                               <span>{message.text}</span>
                             </div>

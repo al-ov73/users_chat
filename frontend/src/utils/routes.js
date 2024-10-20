@@ -1,4 +1,5 @@
 const apiPath = process.env.REACT_APP_API_URL;
+const wcPath = process.env.REACT_APP_WC_URL;
 
 export default {
   loginPath: `${apiPath}/auth/jwt/login`,
@@ -7,4 +8,5 @@ export default {
   usersPath: `${apiPath}/users`,
   chatPath: `${apiPath}/chat`,
   messagesPath: `${apiPath}/chat/messages`,
+  wcPath,
 };
