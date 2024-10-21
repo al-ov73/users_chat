@@ -9,9 +9,12 @@ const getUsernameFromStorage = () => {
 
 const getUserIdFromStorage = () => {
   const token = localStorage.getItem('user');
-  const tokenData = jwtDecode(token);
-  const userId = tokenData.id;
-  return userId;
+  if (token) {
+    const tokenData = jwtDecode(token);
+    const userId = tokenData.id;
+    return userId;
+  }
+  return null
 };
 
 const convertDateTime = (isoString) => {

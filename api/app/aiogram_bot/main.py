@@ -2,7 +2,8 @@ from aiogram import Bot
 
 from ..config.app_config import BOT_TOKEN, TELEGRAM_USER_ID
 
-bot = Bot(token=BOT_TOKEN)
+if BOT_TOKEN:
+    bot = Bot(token=BOT_TOKEN)
 
 
 async def send_message(message: dict):

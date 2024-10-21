@@ -35,7 +35,6 @@ services:
       - db
       - frontend
       - redis
-      - pgadmin
       - worker
     command: gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --reload
     network_mode: "host"
@@ -46,6 +45,7 @@ services:
       - 6379
     network_mode: "host"
 
+  # celery
   worker:
     build:
       context: ./api
@@ -58,14 +58,12 @@ services:
       - redis
     network_mode: "host"
 
-  pgadmin:
-    image: elestio/pgadmin:latest
-    restart: always
-    env_file:
-      - .env-non-dev
-    volumes:
-      - ./servers.json:/pgadmin4/servers.json
+  # nginx service
+  web:
+    container_name: nginx_web
+    image: nginx:alpine
     depends_on:
-      - db
+      - api
+    volumes:
+      - ./nginx_conf:/etc/nginx/conf.d
     network_mode: "host"
-    
