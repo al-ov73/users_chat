@@ -1,6 +1,5 @@
 
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import { FormikProvider, useFormik } from "formik";
 import Form from 'react-bootstrap/Form';
 import React, { useEffect, useState } from "react";
